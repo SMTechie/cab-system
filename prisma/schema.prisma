@@ -1,0 +1,280 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  RIDER
+  DRIVER
+  ADMIN
+}
+
+enum RideStatus {
+  REQUESTED
+  ACCEPTED
+  EN_ROUTE
+  ARRIVED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  REQUIRES_PAYMENT_METHOD
+  PROCESSING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum RideOfferStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DisputeStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+}
+
+model User {
+  id             String          @id @default(cuid())
+  name           String
+  email          String          @unique
+  passwordHash   String
+  role           UserRole        @default(RIDER)
+  phoneNumber    String?
+  preferredLanguage String       @default("en")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  driverProfile  DriverProfile?
+  ridesAsRider   Ride[]          @relation("RiderRides")
+  ridesAsDriver  Ride[]          @relation("DriverRides")
+  driverLocation DriverLocation?
+  savedPlaces    SavedPlace[]
+  rideOffers     RideOffer[]
+  rideRatingsAuthored RideRating[] @relation("RideRatingsAuthored")
+  rideRatingsReceived RideRating[] @relation("RideRatingsReceived")
+  auditLogs      AuditLog[]
+  driverDocuments DriverDocument[] @relation("DriverDocumentsUploaded")
+  reviewedDocuments DriverDocument[] @relation("DriverDocumentsReviewed")
+  safetyAlerts   RideSafetyAlert[]
+
+  @@index([role])
+}
+
+model DriverProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  vehicleMake      String?
+  vehicleModel     String?
+  vehicleColor     String?
+  plateNumber      String?
+  serviceRadiusKm  Int      @default(25)
+  stripeAccountId  String?   @unique
+  commissionBps    Int      @default(1200)
+  isAvailable      Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DriverLocation {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  latitude   Float
+  longitude  Float
+  heading    Float?
+  speed      Float?
+  accuracy   Float?
+  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([updatedAt])
+}
+
+model Ride {
+  id                   String         @id @default(cuid())
+  riderId              String
+  driverId             String?
+  rider                User           @relation("RiderRides", fields: [riderId], references: [id], onDelete: Restrict)
+  driver               User?          @relation("DriverRides", fields: [driverId], references: [id], onDelete: SetNull)
+  originLabel          String
+  originLatitude       Float
+  originLongitude      Float
+  destinationLabel     String
+  destinationLatitude  Float
+  destinationLongitude Float
+  distanceKm           Float
+  durationMinutes      Float
+  baseFareCents        Int
+  perKmFareCents       Int
+  perMinuteFareCents   Int
+  surgeMultiplier      Float          @default(1)
+  estimatedFareCents   Int
+  platformFeeCents     Int            @default(0)
+  currency             String         @default("ZAR")
+  tripType             String         @default("RIDE")
+  scheduledAt          DateTime?
+  bookingForName       String?
+  bookingForPhone      String?
+  parcelCount          Int            @default(1)
+  tipAmountCents       Int            @default(0)
+  status               RideStatus     @default(REQUESTED)
+  paymentStatus        PaymentStatus   @default(UNPAID)
+  stripePaymentIntentId String?
+  stripeChargeId       String?
+  notes                String?
+  shareToken           String?        @unique
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  events               RideEvent[]
+  offers               RideOffer[]
+  ratings              RideRating[]
+  safetyAlerts         RideSafetyAlert[]
+
+  @@index([status, createdAt])
+  @@index([riderId, createdAt])
+  @@index([driverId, createdAt])
+}
+
+model RideEvent {
+  id        String   @id @default(cuid())
+  rideId    String
+  ride      Ride     @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  type      String
+  payload   Json
+  createdAt DateTime @default(now())
+
+  @@index([rideId, createdAt])
+}
+
+model RideOffer {
+  id               String          @id @default(cuid())
+  rideId           String
+  driverId         String
+  offeredFareCents Int
+  surgeMultiplier  Float           @default(1)
+  status           RideOfferStatus @default(PENDING)
+  expiresAt        DateTime
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  ride             Ride            @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  driver           User            @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@unique([rideId, driverId])
+  @@index([driverId, status])
+  @@index([rideId, status])
+  @@index([expiresAt])
+}
+
+model SavedPlace {
+  id         String   @id @default(cuid())
+  userId     String
+  label      String
+  latitude   Float
+  longitude  Float
+  kind       String   @default("CUSTOM")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, kind])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  action      String
+  entityType  String
+  entityId    String?
+  payload     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  actorUser   User?    @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model IdempotencyKey {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  route     String
+  userId    String?
+  response  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([route, userId])
+}
+
+model RideRating {
+  id            String   @id @default(cuid())
+  rideId        String
+  raterUserId   String
+  ratedUserId   String
+  score         Int
+  comment       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  ride          Ride     @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  rater         User     @relation("RideRatingsAuthored", fields: [raterUserId], references: [id], onDelete: Cascade)
+  rated         User     @relation("RideRatingsReceived", fields: [ratedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([rideId, raterUserId])
+  @@index([ratedUserId, createdAt])
+}
+
+model RideSafetyAlert {
+  id              String        @id @default(cuid())
+  rideId          String
+  reporterUserId  String
+  type            String
+  message         String
+  status          DisputeStatus @default(OPEN)
+  createdAt       DateTime      @default(now())
+  resolvedAt      DateTime?
+  ride            Ride          @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  reporter        User          @relation(fields: [reporterUserId], references: [id], onDelete: Cascade)
+
+  @@index([rideId, status])
+  @@index([reporterUserId, createdAt])
+}
+
+model DriverDocument {
+  id          String        @id @default(cuid())
+  userId      String
+  reviewedBy  String?
+  type        String
+  title       String?
+  fileName    String
+  filePath    String
+  mimeType    String
+  status      DocumentStatus @default(PENDING)
+  uploadedAt  DateTime      @default(now())
+  reviewedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  user        User          @relation("DriverDocumentsUploaded", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer    User?         @relation("DriverDocumentsReviewed", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@index([userId, status])
+  @@index([reviewedBy])
+}
