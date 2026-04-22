@@ -424,7 +424,7 @@ export function RideRequestForm({ availableDrivers }: { availableDrivers: Availa
 
         <div className="mt-5 px-0 sm:absolute sm:inset-x-0 sm:bottom-4 sm:mt-0 sm:px-4 sm:z-10">
           <Card className="overflow-hidden rounded-[1.75rem] border border-white/60 bg-white/95 shadow-[0_16px_60px_rgba(15,23,42,0.16)] backdrop-blur p-0">
-            <CardContent className="max-h-[calc(100svh-14rem)] space-y-4 overflow-y-auto overscroll-contain p-5 sm:max-h-[calc(100%-1rem)] sm:p-5">
+            <CardContent className="space-y-4 p-5 sm:p-5">
               {screen === 'home' ? (
                 <>
                   <div className="flex items-center justify-between gap-3">

@@ -126,7 +126,7 @@ export function RideSupportPanel({
         <div className="space-y-3">
           <div className="space-y-2 rounded-3xl border border-border bg-muted/60 p-3">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Chat</p>
-            <div className="max-h-40 space-y-2 overflow-y-auto">
+            <div className="space-y-2">
               {data?.messages?.length ? (
                 data.messages.slice(-3).map((message) => (
                   <div key={message.id} className="rounded-2xl bg-white px-3 py-2 text-sm shadow-sm">

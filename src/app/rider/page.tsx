@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { UserRole } from '@prisma/client';
 import { LocateFixed, Route, Wallet, CarFront, ShieldAlert, Sparkles } from 'lucide-react';
-import { LogoutButton } from '@/components/auth/LogoutButton';
+import { Badge } from '@/components/ui/badge';
+import { RiderAccountMenu } from '@/components/riders/RiderAccountMenu';
 import { QuickActionGrid } from '@/components/layout/QuickActionGrid';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { OverviewStrip } from '@/components/layout/OverviewStrip';
 import { RideRequestForm } from '@/components/rides/RideRequestForm';
 import { RideLiveTracker } from '@/components/rides/RideLiveTracker';
@@ -79,25 +78,10 @@ export default async function RiderPage() {
   return (
     <div className="cab-mobile-theme mobile-phone-shell min-h-[100svh] overflow-y-auto overscroll-y-contain text-[hsl(var(--foreground))]">
       <div className="mx-auto flex min-h-[100svh] w-full max-w-md flex-col px-3 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-3 sm:px-4">
-        <header className="mb-4 flex items-center justify-between rounded-[1.75rem] border border-border bg-card/90 px-4 py-3 shadow-sm backdrop-blur">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-display text-lg font-bold">
-              C
-            </div>
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">CabFlow Rider</p>
-              <p className="font-display text-lg font-semibold tracking-tight">Where to?</p>
-            </div>
-          </div>
+        <header className="mb-4 flex items-center justify-between overflow-visible rounded-[1.75rem] border border-border bg-card/90 px-4 py-3 shadow-sm backdrop-blur">
+          <RiderAccountMenu mode="dashboard" />
           <div className="flex items-center gap-2">
-            <Link
-              href="/rider/profile"
-              className="inline-flex h-10 items-center rounded-full border border-border bg-white px-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground transition hover:bg-muted/60"
-            >
-              Profile
-            </Link>
             <Badge tone={activeRide ? 'warning' : 'muted'}>{activeRide ? 'live' : 'ready'}</Badge>
-            <LogoutButton />
           </div>
         </header>
 
@@ -195,7 +179,6 @@ export default async function RiderPage() {
           <section id="request">
             <RideRequestForm availableDrivers={dashboard.availableDrivers} />
           </section>
-
         </div>
       </div>
     </div>
