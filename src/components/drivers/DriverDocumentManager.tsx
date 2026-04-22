@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+const MAX_DOCUMENT_BYTES = 4_000_000;
+
 interface DriverDocument {
   id: string;
   type: string;
@@ -34,6 +36,10 @@ export function DriverDocumentManager() {
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!file) return;
+    if (file.size > MAX_DOCUMENT_BYTES) {
+      setMessage('File must be 4 MB or smaller');
+      return;
+    }
 
     setBusy(true);
     setMessage(null);
@@ -69,7 +75,7 @@ export function DriverDocumentManager() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <CardTitle>Documents</CardTitle>
-            <CardDescription>Upload license and vehicle files.</CardDescription>
+            <CardDescription>Upload license and vehicle files up to 4 MB.</CardDescription>
           </div>
           <Badge tone="muted">{data?.documents.length ?? 0}</Badge>
         </div>

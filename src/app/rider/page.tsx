@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { UserRole } from '@prisma/client';
+import { LocateFixed, Route, Wallet, CarFront, ShieldAlert, Sparkles } from 'lucide-react';
 import { LogoutButton } from '@/components/auth/LogoutButton';
+import { QuickActionGrid } from '@/components/layout/QuickActionGrid';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { OverviewStrip } from '@/components/layout/OverviewStrip';
@@ -13,7 +15,6 @@ import { RidePaymentCard } from '@/components/payments/RidePaymentCard';
 import { getCurrentSession } from '@/lib/session';
 import { loadRiderDashboard } from '@/lib/dashboard';
 import { formatMoney } from '@/lib/fare';
-import { LocateFixed, Route, Wallet } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Rider dashboard'
@@ -28,6 +29,52 @@ export default async function RiderPage() {
   const activeRide = dashboard.rides.find((ride) => ride.status !== 'COMPLETED' && ride.status !== 'CANCELLED');
   const paymentRide = dashboard.rides.find((ride) => ride.status === 'COMPLETED' && ride.paymentStatus !== 'PAID');
   const supportRide = activeRide ?? paymentRide;
+  const showQuickActions = Boolean(activeRide || paymentRide);
+  const quickActions = [
+    {
+      title: 'Book ride',
+      subtitle: 'Start a new trip',
+      icon: <CarFront className="h-5 w-5" />,
+      href: '#request',
+      tone: 'accent' as const
+    },
+    ...(activeRide
+      ? [
+          {
+            title: 'Live ride',
+            subtitle: 'Track now',
+            icon: <LocateFixed className="h-5 w-5" />,
+            href: '#live'
+          }
+        ]
+      : []),
+    ...(supportRide
+      ? [
+          {
+            title: 'Support',
+            subtitle: 'Chat or SOS',
+            icon: <ShieldAlert className="h-5 w-5" />,
+            href: '#support'
+          }
+        ]
+      : []),
+    ...(paymentRide
+      ? [
+          {
+            title: 'Payment',
+            subtitle: 'Settle fare',
+            icon: <Wallet className="h-5 w-5" />,
+            href: '#payment'
+          }
+        ]
+      : []),
+    {
+      title: 'Profile',
+      subtitle: 'Settings',
+      icon: <Sparkles className="h-5 w-5" />,
+      href: '/rider/profile'
+    }
+  ];
 
   return (
     <div className="cab-mobile-theme mobile-phone-shell min-h-[100svh] overflow-y-auto overscroll-y-contain text-[hsl(var(--foreground))]">
@@ -79,9 +126,22 @@ export default async function RiderPage() {
             ]}
           />
 
-          <section id="request">
-            <RideRequestForm availableDrivers={dashboard.availableDrivers} />
-          </section>
+          {showQuickActions ? (
+            <Card className="overflow-hidden">
+              <CardHeader className="border-b border-border/70 bg-white/70">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <CardTitle>Shortcuts</CardTitle>
+                    <CardDescription>Jump to the parts you need now.</CardDescription>
+                  </div>
+                  <Badge tone="muted">Quick</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-5">
+                <QuickActionGrid items={quickActions} />
+              </CardContent>
+            </Card>
+          ) : null}
 
           {activeRide ? (
             <Card id="live" className="animate-rise-up overflow-hidden">
@@ -131,6 +191,10 @@ export default async function RiderPage() {
               />
             </section>
           ) : null}
+
+          <section id="request">
+            <RideRequestForm availableDrivers={dashboard.availableDrivers} />
+          </section>
 
         </div>
       </div>

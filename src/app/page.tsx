@@ -1,167 +1,91 @@
 import Link from 'next/link';
-import { ArrowRight, Clock3, CreditCard, MapPinned, ShieldCheck, Sparkles, Waves } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { ArrowRight, MapPinned, RadioTower, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { InstallPrompt } from '@/components/pwa/InstallPrompt';
 
 const features = [
   {
     icon: MapPinned,
-    title: 'Live dispatch map',
-    description: 'Track drivers in real time with Socket.IO and fall back to polling when the socket is unavailable.'
+    title: 'Live map',
+    description: 'Riders and drivers stay visible on the same screen.'
   },
   {
-    icon: CreditCard,
-    title: 'Stripe Connect payouts',
-    description: 'Onboard drivers as connected accounts and create destination charges with platform commission.'
+    icon: RadioTower,
+    title: 'Realtime fallback',
+    description: 'Socket updates first, polling when the socket is unavailable.'
   },
   {
     icon: ShieldCheck,
-    title: 'Role-aware security',
-    description: 'Every API route validates the current user role before exposing ride, driver, or admin actions.'
-  },
-  {
-    icon: Clock3,
-    title: 'Fare estimates',
-    description: 'Base fare plus distance and duration pricing, with optional surge multiplier support.'
+    title: 'Secure flow',
+    description: 'Role-aware actions keep rider, driver, and admin screens separated.'
   }
 ];
 
 export default function HomePage() {
   return (
-    <div className="relative overflow-hidden">
-      <div className="absolute inset-x-0 top-0 -z-10 h-[42rem] bg-[radial-gradient(circle_at_top,_rgba(18,194,185,0.18),_transparent_34%),radial-gradient(circle_at_80%_0%,_rgba(245,158,11,0.18),_transparent_24%)]" />
+    <main className="cab-mobile-theme relative min-h-[100svh] overflow-hidden text-[hsl(var(--foreground))]">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[linear-gradient(180deg,#facc15_0%,#facc15_58%,#eef2f7_58%,#eef2f7_100%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_15%_8%,rgba(255,255,255,0.22),transparent_26%),radial-gradient(circle_at_86%_11%,rgba(255,255,255,0.14),transparent_24%)]"
+      />
 
-      <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/15 text-primary ring-1 ring-inset ring-primary/20">
-            <span className="font-display text-lg font-bold">C</span>
-          </div>
-          <div>
-            <p className="font-display text-lg font-semibold tracking-tight">CabFlow</p>
-            <p className="text-xs text-muted-foreground">Fleet dispatch MVP</p>
-          </div>
-        </div>
+      <div className="relative mx-auto flex min-h-[100svh] w-full max-w-[430px] flex-col px-4 py-4">
+        <section className="flex min-h-[44svh] flex-col items-center justify-start px-2 pt-6 text-center text-white">
+          <span className="inline-flex rounded-full border border-white/35 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.26em] text-white/90">
+            CabFlow mobile
+          </span>
 
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/register">
-              Get started
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-      </header>
+          <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.42em] text-white/80">
+            Dispatch. Track. Settle.
+          </p>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-col gap-16 px-4 pb-20 pt-10 sm:px-6 lg:px-8">
-        <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div className="space-y-7">
-            <Badge>Next.js 14 + Socket.IO + Stripe Connect</Badge>
-            <div className="space-y-5">
-              <h1 className="max-w-4xl font-display text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-                Dispatch rides, stream locations, and settle fares in one clean operator console.
-              </h1>
-              <p className="max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-                CabFlow is a TypeScript-first taxi platform scaffold with role-validated APIs, Mapbox routing,
-                realtime driver tracking, PWA support, and Stripe Connect payment flows for marketplace-style payouts.
-              </p>
-            </div>
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-balance text-white sm:text-5xl">
+            Welcome to CabFlow
+          </h1>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <Button asChild>
-                <Link href="/register">
-                  Start the MVP
-                  <Sparkles className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button variant="secondary" asChild>
-                <Link href="/login">Open demo account</Link>
-              </Button>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-3">
-              {[
-                { label: 'Live updates', value: 'Socket.IO' },
-                { label: 'Offline ready', value: 'PWA' },
-                { label: 'Payments', value: 'Stripe Connect' }
-              ].map((item) => (
-                <Card key={item.label} className="p-4">
-                  <CardDescription className="mt-0 text-xs uppercase tracking-[0.18em]">{item.label}</CardDescription>
-                  <CardTitle className="mt-2 text-2xl">{item.value}</CardTitle>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <Card className="relative overflow-hidden p-0">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(18,194,185,0.18),_transparent_35%)]" />
-            <div className="relative space-y-5 p-6 sm:p-8">
-              <CardHeader className="mb-0 p-0">
-                <CardTitle>Operational snapshot</CardTitle>
-                <CardDescription>
-                  A dashboard that keeps riders, drivers, and admins aligned without switching tools.
-                </CardDescription>
-              </CardHeader>
-
-              <div className="space-y-4">
-                {[
-                  'Request a ride and quote the fare before dispatch.',
-                  'Share driver GPS updates in real time.',
-                  'Create payment intents and mark rides paid on webhook confirmation.',
-                  'Serve an offline fallback when the network drops.'
-                ].map((line) => (
-                  <div key={line} className="flex items-start gap-3 rounded-2xl border border-border/80 bg-black/10 p-4">
-                    <Waves className="mt-0.5 h-4 w-4 text-primary" />
-                    <p className="text-sm leading-6 text-muted-foreground">{line}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
+          <p className="mt-4 max-w-[22rem] text-lg leading-8 text-white/90">
+            Intelligent dispatch software to guide every ride.
+          </p>
         </section>
 
-        <section className="space-y-8">
-          <div className="max-w-2xl space-y-3">
-            <p className="eyebrow">Core features</p>
-            <h2 className="section-heading">Everything the MVP needs to behave like a real fleet product.</h2>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <section className="animate-rise-up -mt-4 rounded-[2.5rem] border border-white/70 bg-white p-4 shadow-[0_20px_60px_rgba(15,23,42,0.16)]">
+          <div className="space-y-3">
             {features.map((feature) => {
               const Icon = feature.icon;
+
               return (
-                <Card key={feature.title} className="h-full">
-                  <CardHeader>
-                    <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <CardTitle>{feature.title}</CardTitle>
-                    <CardDescription>{feature.description}</CardDescription>
-                  </CardHeader>
-                </Card>
+                <div key={feature.title} className="flex items-start gap-3 rounded-[1.25rem] border border-slate-200 bg-white p-4 shadow-[0_1px_0_rgba(15,23,42,0.03)]">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 text-left">
+                    <p className="text-base font-semibold tracking-tight text-slate-900">{feature.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-slate-500">{feature.description}</p>
+                  </div>
+                </div>
               );
             })}
           </div>
-        </section>
 
-        <section className="surface flex flex-col gap-6 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-2xl space-y-2">
-            <p className="eyebrow">Demo credentials</p>
-            <h2 className="section-heading">Seeded accounts are included in the Prisma seed.</h2>
-            <p className="text-sm leading-6 text-muted-foreground">
-              Use the admin, driver, or rider account after running the seed script to explore the full flow.
-            </p>
+          <div className="mt-4 rounded-[1.5rem] bg-slate-50 p-2">
+            <Button
+              asChild
+              className="w-full rounded-full py-4 text-lg font-bold shadow-[0_18px_36px_rgba(250,204,21,0.35)] animate-soft-pulse"
+            >
+              <Link href="/register">
+                Get started
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </Button>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Badge tone="success">admin@cab.local</Badge>
-            <Badge tone="warning">driver@cab.local</Badge>
-            <Badge tone="muted">rider@cab.local</Badge>
-          </div>
+
+          <InstallPrompt className="mt-3" />
         </section>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

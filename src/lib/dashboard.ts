@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { serializeDriverLocation, serializeRide, serializeUser, type SafeDriverLocation, type SafeRide, type SafeUser } from '@/lib/serializers';
+import { getDriverDocumentFilePath } from '@/lib/driver-documents';
 
 export interface DriverLocationWithUser {
   user: SafeUser;
@@ -198,7 +199,7 @@ export async function loadDriverDashboard(userId: string): Promise<DriverDashboa
       type: document.type,
       title: document.title,
       status: document.status,
-      filePath: document.filePath,
+      filePath: getDriverDocumentFilePath(document.id),
       uploadedAt: document.uploadedAt.toISOString()
     }))
   };
@@ -285,7 +286,7 @@ export async function loadAdminDashboard(): Promise<AdminDashboardData> {
       type: document.type,
       title: document.title,
       status: document.status,
-      filePath: document.filePath,
+      filePath: getDriverDocumentFilePath(document.id),
       uploadedAt: document.uploadedAt.toISOString()
     }))
   };

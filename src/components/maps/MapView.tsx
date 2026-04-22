@@ -7,6 +7,7 @@ import type { MapLayerMouseEvent } from 'react-map-gl';
 import { MapPin } from 'lucide-react';
 import { useMap } from '@/hooks/useMap';
 import type { MapCoordinates } from '@/hooks/useMap';
+import { useMapboxToken } from '@/components/providers';
 
 export interface MapPoint extends MapCoordinates {
   id: string;
@@ -22,6 +23,7 @@ export interface MapViewProps {
   heightClassName?: string;
   onMapClick?: (coordinates: MapCoordinates) => void;
   interactive?: boolean;
+  mapboxAccessToken?: string | null;
 }
 
 const routeLayer = {
@@ -48,11 +50,13 @@ export function MapView({
   className,
   heightClassName = 'h-[26rem]',
   onMapClick,
-  interactive = true
+  interactive = true,
+  mapboxAccessToken
 }: MapViewProps) {
   const { mapRef, viewState, setViewState } = useMap(initialCenter);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  const contextToken = useMapboxToken();
+  const token = mapboxAccessToken ?? contextToken;
 
   const routeData = useMemo<GeoJSON.FeatureCollection<GeoJSON.LineString> | null>(() => {
     if (!route) return null;
@@ -99,14 +103,17 @@ export function MapView({
 
   if (!token) {
     return (
-      <div className={`surface flex ${heightClassName} items-center justify-center p-6 ${className ?? ''}`}>
-        <div className="max-w-md space-y-3 text-center">
-          <MapPin className="mx-auto h-6 w-6 text-primary" />
-          <p className="font-display text-lg font-semibold">Mapbox token missing</p>
-          <p className="text-sm leading-6 text-muted-foreground">
-            Set <code>NEXT_PUBLIC_MAPBOX_TOKEN</code> to enable the interactive map. The rest of the app still works
-            without it.
-          </p>
+      <div className={`surface relative overflow-hidden ${heightClassName} ${className ?? ''}`}>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#f8fafc_0%,#eef4fb_100%)]" />
+        <div className="absolute inset-0 opacity-60 bg-[radial-gradient(circle_at_20%_20%,rgba(250,204,21,0.16),transparent_26%),radial-gradient(circle_at_80%_30%,rgba(18,194,185,0.12),transparent_22%),linear-gradient(135deg,transparent_0%,transparent_47%,rgba(148,163,184,0.18)_48%,transparent_49%,transparent_100%)] bg-[length:100%_100%,100%_100%,24px_24px]" />
+        <div className="relative z-10 flex h-full items-center justify-center p-6">
+          <div className="max-w-md space-y-3 text-center">
+            <MapPin className="mx-auto h-6 w-6 text-primary" />
+            <p className="font-display text-lg font-semibold">Map preview unavailable</p>
+            <p className="text-sm leading-6 text-muted-foreground">
+              Set <code>NEXT_PUBLIC_MAPBOX_TOKEN</code> or <code>MAPBOX_TOKEN</code> to enable the live map.
+            </p>
+          </div>
         </div>
       </div>
     );

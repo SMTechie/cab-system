@@ -3,17 +3,25 @@ import { userRoles } from '@/lib/roles';
 import { rideStatusOrder, paymentStatusValues } from '@/lib/constants';
 
 const coordinate = z.number().finite();
+const emailSchema = z.string().trim().toLowerCase().email('Enter a valid email address');
+const passwordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .max(128, 'Password must be 128 characters or fewer');
+const nameSchema = z.string().trim().min(2, 'Enter your full name').max(80, 'Full name must be 80 characters or fewer');
 
 export const registerSchema = z.object({
-  name: z.string().min(2).max(80),
-  email: z.string().email(),
-  password: z.string().min(8).max(128),
-  role: z.enum(userRoles).default('RIDER')
+  name: nameSchema,
+  email: emailSchema,
+  password: passwordSchema,
+  role: z.enum(userRoles, {
+    message: 'Choose rider or driver'
+  }).default('RIDER')
 });
 
 export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1)
+  email: emailSchema,
+  password: z.string().min(1, 'Enter your password')
 });
 
 export const rideCreateSchema = z.object({
@@ -59,8 +67,8 @@ export const availabilitySchema = z.object({
 });
 
 export const accountProfileSchema = z.object({
-  name: z.string().min(2).max(80).optional(),
-  email: z.string().email().optional(),
+  name: nameSchema.optional(),
+  email: emailSchema.optional(),
   phoneNumber: z.string().min(5).max(24).optional().nullable(),
   preferredLanguage: z.string().min(2).max(12).optional(),
   vehicleMake: z.string().min(1).max(60).optional().nullable(),

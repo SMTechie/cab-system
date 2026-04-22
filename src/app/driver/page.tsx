@@ -1,21 +1,18 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { UserRole } from '@prisma/client';
-import { LogoutButton } from '@/components/auth/LogoutButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { OverviewStrip } from '@/components/layout/OverviewStrip';
 import { QuickActionGrid } from '@/components/layout/QuickActionGrid';
 import { DriverControls } from '@/components/drivers/DriverControls';
+import { DriverAccountMenu } from '@/components/drivers/DriverAccountMenu';
 import { RideOfferInbox } from '@/components/drivers/RideOfferInbox';
-import { DriverDocumentManager } from '@/components/drivers/DriverDocumentManager';
-import { DriverLocationSync } from '@/components/drivers/DriverLocationSync';
 import { RideLiveTracker } from '@/components/rides/RideLiveTracker';
 import { getCurrentSession } from '@/lib/session';
 import { loadDriverDashboard } from '@/lib/dashboard';
 import { formatMoney } from '@/lib/fare';
-import { BellRing, FileText, RadioTower, Route, Sparkles, UserRound, Wallet } from 'lucide-react';
+import { BellRing, FileText, RadioTower, Route, UserRound, Wallet } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Driver dashboard'
@@ -34,27 +31,12 @@ export default async function DriverPage() {
   return (
     <div className="cab-mobile-theme mobile-phone-shell min-h-[100svh] overflow-y-auto overscroll-y-contain text-[hsl(var(--foreground))]">
       <div className="mx-auto flex min-h-[100svh] w-full max-w-md flex-col px-3 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-3 sm:px-4">
-        <header className="mb-4 flex items-center justify-between rounded-[1.75rem] border border-border bg-card/90 px-4 py-3 shadow-sm backdrop-blur">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground font-display text-lg font-bold">
-              C
-            </div>
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">CabFlow Driver</p>
-              <p className="font-display text-lg font-semibold tracking-tight">Ready to earn</p>
-            </div>
-          </div>
+        <header className="mb-4 flex items-center justify-between overflow-visible rounded-[1.75rem] border border-border bg-card/90 px-4 py-3 shadow-sm backdrop-blur">
+          <DriverAccountMenu mode="dashboard" isAvailable={available} />
           <div className="flex items-center gap-2">
-            <Link
-              href="/driver/profile"
-              className="inline-flex h-10 items-center rounded-full border border-border bg-white px-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground transition hover:bg-muted/60"
-            >
-              Profile
-            </Link>
             <Badge tone={available ? 'success' : 'muted'}>
               {available ? 'online' : 'offline'}
             </Badge>
-            <LogoutButton />
           </div>
         </header>
 
@@ -85,60 +67,6 @@ export default async function DriverPage() {
             ]}
           />
 
-          <Card className="overflow-hidden">
-            <CardHeader className="border-b border-border/70 bg-white/70">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <CardTitle>Shortcuts</CardTitle>
-                  <CardDescription>Profile, shift, requests, documents, and payout.</CardDescription>
-                </div>
-                <Badge tone="muted">Quick</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-5">
-              <QuickActionGrid
-                items={[
-                  {
-                    title: 'Profile',
-                    subtitle: 'Edit driver info',
-                    icon: <UserRound className="h-5 w-5" />,
-                    href: '/driver/profile'
-                  },
-                  {
-                    title: 'Shift',
-                    subtitle: 'Go online fast',
-                    icon: <RadioTower className="h-5 w-5" />,
-                    href: '#availability'
-                  },
-                  {
-                    title: 'Requests',
-                    subtitle: 'New ride offers',
-                    icon: <BellRing className="h-5 w-5" />,
-                    href: '#offers'
-                  },
-                  {
-                    title: 'Documents',
-                    subtitle: 'Upload files',
-                    icon: <FileText className="h-5 w-5" />,
-                    href: '#documents'
-                  },
-                  {
-                    title: 'Live trip',
-                    subtitle: 'Track active ride',
-                    icon: <Route className="h-5 w-5" />,
-                    href: '#live'
-                  },
-                  {
-                    title: 'Payout',
-                    subtitle: 'Stripe Connect',
-                    icon: <Sparkles className="h-5 w-5" />,
-                    href: '#payout'
-                  }
-                ]}
-              />
-            </CardContent>
-          </Card>
-
           <section id="availability">
             <DriverControls
               isAvailable={dashboard.profile?.isAvailable ?? false}
@@ -153,7 +81,64 @@ export default async function DriverPage() {
             <RideOfferInbox />
           </section>
 
-          <DriverLocationSync rideId={activeRide?.id ?? null} />
+          <Card className="overflow-hidden">
+            <CardHeader className="border-b border-border/70 bg-white/70">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <CardTitle>Shortcuts</CardTitle>
+                  <CardDescription>Shift, requests, live trip, documents, payout, and profile.</CardDescription>
+                </div>
+                <Badge tone="muted">Quick</Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-5">
+              <QuickActionGrid
+                items={[
+                  {
+                    title: 'Shift',
+                    subtitle: 'Go online fast',
+                    icon: <RadioTower className="h-5 w-5" />,
+                    href: '#availability',
+                    tone: 'accent'
+                  },
+                  {
+                    title: 'Requests',
+                    subtitle: 'New ride offers',
+                    icon: <BellRing className="h-5 w-5" />,
+                    href: '#offers'
+                  },
+                  ...(activeRide
+                    ? [
+                        {
+                          title: 'Live trip',
+                          subtitle: 'Track ride',
+                          icon: <Route className="h-5 w-5" />,
+                          href: '#live'
+                        }
+                      ]
+                    : []),
+                  {
+                    title: 'Documents',
+                    subtitle: 'Profile settings',
+                    icon: <FileText className="h-5 w-5" />,
+                    href: '/driver/profile#documents'
+                  },
+                  {
+                    title: 'Payout',
+                    subtitle: 'Stripe Connect',
+                    icon: <Wallet className="h-5 w-5" />,
+                    href: '#payout'
+                  },
+                  {
+                    title: 'Settings',
+                    subtitle: 'Driver tools',
+                    icon: <UserRound className="h-5 w-5" />,
+                    href: '/driver/profile#settings'
+                  }
+                ]}
+              />
+            </CardContent>
+          </Card>
 
           {activeRide ? (
             <Card id="live" className="animate-rise-up overflow-hidden">
@@ -185,10 +170,6 @@ export default async function DriverPage() {
               </CardContent>
             </Card>
           ) : null}
-
-          <section id="documents">
-            <DriverDocumentManager />
-          </section>
 
           <Card className="animate-rise-up">
             <CardHeader>

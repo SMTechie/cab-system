@@ -140,12 +140,27 @@ textarea {
   }
 }
 
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 .animate-rise-up {
   animation: rise-up 0.48s ease-out both;
 }
 
 .animate-soft-pulse {
   animation: soft-pulse 2.8s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 5.5s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

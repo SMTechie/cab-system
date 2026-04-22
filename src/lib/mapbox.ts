@@ -45,15 +45,20 @@ function degreesToRadians(value: number) {
   return (value * Math.PI) / 180;
 }
 
+function getMapboxToken() {
+  return env.MAPBOX_TOKEN || env.NEXT_PUBLIC_MAPBOX_TOKEN || null;
+}
+
 export async function fetchDirections(origin: Coordinate, destination: Coordinate): Promise<DirectionsResult> {
-  if (!env.MAPBOX_TOKEN) {
+  const token = getMapboxToken();
+  if (!token) {
     return buildStraightLineRoute(origin, destination);
   }
 
   const url = new URL(
     `https://api.mapbox.com/directions/v5/mapbox/driving/${origin.longitude},${origin.latitude};${destination.longitude},${destination.latitude}`
   );
-  url.searchParams.set('access_token', env.MAPBOX_TOKEN);
+  url.searchParams.set('access_token', token);
   url.searchParams.set('geometries', 'geojson');
   url.searchParams.set('overview', 'full');
   url.searchParams.set('steps', 'false');
@@ -97,14 +102,15 @@ export async function searchPlaces(query: string, limit = 5): Promise<PlaceSugge
   const normalized = query.trim();
   if (!normalized) return [];
 
-  if (!env.MAPBOX_TOKEN) {
+  const token = getMapboxToken();
+  if (!token) {
     return [];
   }
 
   const url = new URL(
     `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(normalized)}.json`
   );
-  url.searchParams.set('access_token', env.MAPBOX_TOKEN);
+  url.searchParams.set('access_token', token);
   url.searchParams.set('limit', String(limit));
   url.searchParams.set('autocomplete', 'true');
   url.searchParams.set('country', 'za');

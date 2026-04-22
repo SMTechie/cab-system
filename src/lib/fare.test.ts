@@ -15,6 +15,6 @@ describe('fare', () => {
   });
 
   it('formats South African currency', () => {
-    expect(formatMoney(28_25, 'ZAR')).toContain('R');
+    expect(formatMoney(28_25, 'ZAR')).toBe('R 28.25');
   });
 });

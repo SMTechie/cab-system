@@ -56,10 +56,19 @@ export function calculateFare(input: FareInput): FareQuote {
 }
 
 export function formatMoney(cents: number, currency: string = fareDefaults.currency) {
-  const locale = currency === 'ZAR' ? 'en-ZA' : 'en-US';
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 2
-  }).format(cents / 100);
+  const amount = cents / 100;
+
+  try {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      currencyDisplay: 'narrowSymbol',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })
+      .format(amount)
+      .replace(/\u00a0/g, ' ');
+  } catch {
+    return `${currency} ${amount.toFixed(2)}`;
+  }
 }

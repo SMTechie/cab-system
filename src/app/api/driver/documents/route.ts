@@ -1,10 +1,13 @@
 import { UserRole } from '@prisma/client';
+import { randomUUID } from 'node:crypto';
 import { jsonError, jsonSuccess } from '@/lib/api';
 import { AppError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
 import { getSessionFromRequest } from '@/lib/session';
 import { recordAuditLog } from '@/lib/audit';
-import { storeUpload } from '@/lib/uploads';
+import { getDriverDocumentFilePath } from '@/lib/driver-documents';
+
+const MAX_DOCUMENT_BYTES = 4_000_000;
 
 export async function GET(request: Request) {
   try {
@@ -24,7 +27,7 @@ export async function GET(request: Request) {
         type: document.type,
         title: document.title,
         fileName: document.fileName,
-        filePath: document.filePath,
+        filePath: getDriverDocumentFilePath(document.id),
         mimeType: document.mimeType,
         status: document.status,
         uploadedAt: document.uploadedAt.toISOString(),
@@ -57,15 +60,23 @@ export async function POST(request: Request) {
       throw new AppError('Document file is required', 422, 'validation_error');
     }
 
-    const stored = await storeUpload(file, 'driver-documents');
+    if (file.size > MAX_DOCUMENT_BYTES) {
+      throw new AppError('Document file must be 4 MB or smaller', 413, 'file_too_large');
+    }
+
+    const fileData = Buffer.from(await file.arrayBuffer());
+    const documentId = randomUUID();
+    const filePath = getDriverDocumentFilePath(documentId);
     const document = await prisma.driverDocument.create({
       data: {
+        id: documentId,
         userId: session.userId,
         type,
         title,
-        fileName: stored.fileName,
-        filePath: stored.filePath,
-        mimeType: stored.mimeType
+        fileName: file.name,
+        filePath,
+        fileData,
+        mimeType: file.type || 'application/octet-stream'
       }
     });
 

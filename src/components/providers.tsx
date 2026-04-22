@@ -1,7 +1,10 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { SWRConfig } from 'swr';
+import { NotificationProvider } from '@/components/notifications/NotificationProvider';
+
+const MapboxTokenContext = createContext<string | null>(null);
 
 export async function apiFetcher<T = unknown>(url: string): Promise<T> {
   const response = await fetch(url, {
@@ -22,17 +25,28 @@ export async function apiFetcher<T = unknown>(url: string): Promise<T> {
   return (payload?.data ?? payload) as T;
 }
 
-export function Providers({ children }: { children: ReactNode }) {
-  return (
-    <SWRConfig
-      value={{
-        fetcher: apiFetcher,
-        revalidateOnFocus: false,
-        shouldRetryOnError: false,
-        keepPreviousData: true
-      }}
-    >
-      {children}
-    </SWRConfig>
+export function Providers({ children, mapboxToken }: { children: ReactNode; mapboxToken?: string | null }) {
+  const swrValue = useMemo(
+    () => ({
+      fetcher: apiFetcher,
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      keepPreviousData: true
+    }),
+    []
   );
+
+  const mapboxValue = useMemo(() => mapboxToken ?? null, [mapboxToken]);
+
+  return (
+    <MapboxTokenContext.Provider value={mapboxValue}>
+      <NotificationProvider>
+        <SWRConfig value={swrValue}>{children}</SWRConfig>
+      </NotificationProvider>
+    </MapboxTokenContext.Provider>
+  );
+}
+
+export function useMapboxToken() {
+  return useContext(MapboxTokenContext);
 }

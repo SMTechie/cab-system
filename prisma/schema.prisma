@@ -266,6 +266,7 @@ model DriverDocument {
   title       String?
   fileName    String
   filePath    String
+  fileData    Bytes?
   mimeType    String
   status      DocumentStatus @default(PENDING)
   uploadedAt  DateTime      @default(now())

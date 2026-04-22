@@ -73,6 +73,7 @@ Use the values from `.env.example` as a starting point:
 - `NEXT_PUBLIC_MAPBOX_TOKEN` browser Mapbox token for the interactive map
 - `NEXT_PUBLIC_APP_URL` public app origin
 - `SOCKET_CORS_ORIGIN` optional Socket.IO CORS origin
+- `NEXT_PUBLIC_SOCKET_URL` optional Socket.IO server URL
 - `ALERT_WEBHOOK_URL` optional webhook for safety alerts
 - `RATE_LIMIT_WINDOW_MS` rate limit window in milliseconds
 - `RATE_LIMIT_MAX_REQUESTS` maximum requests allowed per window
@@ -85,7 +86,7 @@ Use the values from `.env.example` as a starting point:
 npm run dev
 ```
 
-The custom Node server starts Next.js and Socket.IO together on `http://localhost:3000`.
+Next.js runs on `http://localhost:3000`.
 
 ### Production build
 
@@ -116,9 +117,9 @@ Password123!
 ## Realtime Flow
 
 - Drivers send GPS updates from the driver dashboard.
-- The client prefers Socket.IO for updates.
-- If the socket drops, rider views fall back to polling `/api/rides/[rideId]/location`.
-- Socket rooms are used so only the relevant ride or driver receives updates.
+- The client uses Socket.IO only when `NEXT_PUBLIC_SOCKET_URL` is set.
+- Rider views fall back to polling `/api/rides/[rideId]/location`.
+- Driver and rider screens stay functional on Vercel without a long-lived socket server.
 
 ## PWA Flow
 
