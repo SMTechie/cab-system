@@ -7,6 +7,8 @@ import { emitRideState } from '@/lib/realtime';
 import { serializeRide } from '@/lib/serializers';
 import { AppError } from '@/lib/errors';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     if (!env.STRIPE_WEBHOOK_SECRET) {

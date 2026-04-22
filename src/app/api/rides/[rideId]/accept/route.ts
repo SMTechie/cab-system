@@ -5,6 +5,8 @@ import { getSessionFromRequest } from '@/lib/session';
 import { serializeRide } from '@/lib/serializers';
 import { claimRideOffer } from '@/lib/dispatch';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request, context: { params: { rideId: string } }) {
   try {
     const session = await getSessionFromRequest(request);

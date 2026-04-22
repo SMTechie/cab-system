@@ -9,6 +9,8 @@ import { canAccessRide, canTransitionRide, getRideById } from '@/lib/ride-servic
 import { serializeRide } from '@/lib/serializers';
 import { appendRideEvent, emitRideState } from '@/lib/realtime';
 
+export const dynamic = 'force-dynamic';
+
 export async function PATCH(request: Request, context: { params: { rideId: string } }) {
   try {
     const session = await getSessionFromRequest(request);

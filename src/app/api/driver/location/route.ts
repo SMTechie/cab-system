@@ -5,6 +5,8 @@ import { parseJsonBody } from '@/lib/request';
 import { locationSchema } from '@/lib/validators';
 import { AppError } from '@/lib/errors';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const session = await getSessionFromRequest(request);

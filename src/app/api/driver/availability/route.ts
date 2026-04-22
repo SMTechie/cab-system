@@ -5,6 +5,8 @@ import { parseJsonBody } from '@/lib/request';
 import { availabilitySchema } from '@/lib/validators';
 import { AppError } from '@/lib/errors';
 
+export const dynamic = 'force-dynamic';
+
 export async function PATCH(request: Request) {
   try {
     const session = await getSessionFromRequest(request);

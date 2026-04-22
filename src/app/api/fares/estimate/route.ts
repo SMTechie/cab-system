@@ -3,6 +3,8 @@ import { calculateFare } from '@/lib/fare';
 import { parseJsonBody } from '@/lib/request';
 import { fareEstimateSchema } from '@/lib/validators';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const payload = await parseJsonBody(request, fareEstimateSchema);

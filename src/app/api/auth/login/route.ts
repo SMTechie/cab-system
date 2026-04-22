@@ -4,6 +4,8 @@ import { applySessionCookie } from '@/lib/session';
 import { parseJsonBody } from '@/lib/request';
 import { loginSchema } from '@/lib/validators';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const payload = await parseJsonBody(request, loginSchema);

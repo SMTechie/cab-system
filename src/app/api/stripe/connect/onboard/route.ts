@@ -6,6 +6,8 @@ import { prisma } from '@/lib/prisma';
 import { getStripe } from '@/lib/stripe';
 import { getSessionFromRequest, requestOrigin } from '@/lib/session';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const session = await getSessionFromRequest(request);

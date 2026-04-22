@@ -11,6 +11,8 @@ import { runIdempotent } from '@/lib/idempotency';
 import { parseJsonBody } from '@/lib/request';
 import { paymentIntentTipSchema } from '@/lib/validators';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request, context: { params: { rideId: string } }) {
   try {
     const session = await getSessionFromRequest(request);

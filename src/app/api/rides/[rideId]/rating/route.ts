@@ -13,6 +13,8 @@ const ratingSchema = z.object({
   comment: z.string().max(500).optional().nullable()
 });
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request, context: { params: { rideId: string } }) {
   try {
     const session = await getSessionFromRequest(request);

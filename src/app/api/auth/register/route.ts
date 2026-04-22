@@ -4,6 +4,8 @@ import { jsonError, jsonSuccess } from '@/lib/api';
 import { parseJsonBody } from '@/lib/request';
 import { registerSchema } from '@/lib/validators';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const payload = await parseJsonBody(request, registerSchema);
