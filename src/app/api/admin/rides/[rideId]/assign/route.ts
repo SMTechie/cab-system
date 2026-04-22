@@ -14,6 +14,8 @@ const assignSchema = z.object({
   driverId: z.string().min(1)
 });
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request, context: { params: { rideId: string } }) {
   try {
     const session = await getSessionFromRequest(request);
