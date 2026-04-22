@@ -6,6 +6,8 @@ import { getSessionFromRequest } from '@/lib/session';
 import { getRideById, canAccessRide } from '@/lib/ride-service';
 import { formatMoney } from '@/lib/fare';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request, context: { params: { rideId: string } }) {
   try {
     const session = await getSessionFromRequest(request);

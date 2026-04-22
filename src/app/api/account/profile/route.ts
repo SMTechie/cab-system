@@ -7,6 +7,8 @@ import { parseJsonBody } from '@/lib/request';
 import { accountProfileSchema } from '@/lib/validators';
 import { serializeUser } from '@/lib/serializers';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getSessionFromRequest(request);

@@ -4,6 +4,8 @@ import { getSessionFromRequest } from '@/lib/session';
 import { canAccessRide, getRideById } from '@/lib/ride-service';
 import { serializeRide } from '@/lib/serializers';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request, context: { params: { rideId: string } }) {
   try {
     const session = await getSessionFromRequest(request);

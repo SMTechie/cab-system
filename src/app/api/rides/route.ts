@@ -15,6 +15,8 @@ import { recordAuditLog } from '@/lib/audit';
 import { assertRateLimit, getRequestFingerprint } from '@/lib/rate-limit';
 import { runIdempotent } from '@/lib/idempotency';
 
+export const dynamic = 'force-dynamic';
+
 function serializeRideQueryStatus(status: string | null): RideStatus | null {
   if (!status) return null;
   if (['REQUESTED', 'ACCEPTED', 'EN_ROUTE', 'ARRIVED', 'COMPLETED', 'CANCELLED'].includes(status)) {

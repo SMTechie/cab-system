@@ -3,6 +3,8 @@ import { AppError } from '@/lib/errors';
 import { prisma } from '@/lib/prisma';
 import { serializeRide } from '@/lib/serializers';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(_request: Request, context: { params: { token: string } }) {
   try {
     const ride = await prisma.ride.findUnique({

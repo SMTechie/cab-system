@@ -3,6 +3,8 @@ import { getSessionFromRequest } from '@/lib/session';
 import { jsonError, jsonSuccess } from '@/lib/api';
 import { serializeUser } from '@/lib/serializers';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getSessionFromRequest(request);

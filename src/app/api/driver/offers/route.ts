@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma';
 import { getSessionFromRequest } from '@/lib/session';
 import { recordAuditLog } from '@/lib/audit';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getSessionFromRequest(request);

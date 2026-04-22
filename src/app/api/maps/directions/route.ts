@@ -4,6 +4,8 @@ import { fetchDirections } from '@/lib/mapbox';
 import { parseSearchParams } from '@/lib/request';
 import { directionsSchema } from '@/lib/validators';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const params = parseSearchParams(request);

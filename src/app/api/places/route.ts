@@ -14,6 +14,8 @@ const placeSchema = z.object({
   kind: z.string().min(2).max(40).optional()
 });
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getSessionFromRequest(request);

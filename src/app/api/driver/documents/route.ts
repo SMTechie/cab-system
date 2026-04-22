@@ -9,6 +9,8 @@ import { getDriverDocumentFilePath } from '@/lib/driver-documents';
 
 const MAX_DOCUMENT_BYTES = 4_000_000;
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getSessionFromRequest(request);

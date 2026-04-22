@@ -4,6 +4,8 @@ import { jsonError, jsonSuccess } from '@/lib/api';
 import { serializeDriverLocation, serializeUser } from '@/lib/serializers';
 import { AppError } from '@/lib/errors';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const session = await getSessionFromRequest(request);

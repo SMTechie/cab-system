@@ -2,6 +2,8 @@ import { jsonError, jsonSuccess } from '@/lib/api';
 import { AppError } from '@/lib/errors';
 import { searchPlaces } from '@/lib/mapbox';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const params = new URL(request.url).searchParams;

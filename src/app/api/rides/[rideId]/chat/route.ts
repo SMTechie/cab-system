@@ -12,6 +12,8 @@ const messageSchema = z.object({
   message: z.string().min(1).max(500)
 });
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request, context: { params: { rideId: string } }) {
   try {
     const session = await getSessionFromRequest(request);
