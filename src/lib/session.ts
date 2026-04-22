@@ -8,7 +8,13 @@ import { AppError } from '@/lib/errors';
 import { hasRole, type UserRole } from '@/lib/roles';
 import type { SafeUser } from '@/lib/serializers';
 
-const secret = new TextEncoder().encode(env.AUTH_SECRET);
+function getSessionSecret() {
+  if (!env.AUTH_SECRET) {
+    return null;
+  }
+
+  return new TextEncoder().encode(env.AUTH_SECRET);
+}
 
 export interface SessionUser {
   userId: string;
@@ -28,6 +34,11 @@ export interface SessionCookieOptions {
 }
 
 export async function signSession(user: SessionUser) {
+  const secret = getSessionSecret();
+  if (!secret) {
+    throw new AppError('AUTH_SECRET is not configured', 500, 'auth_not_configured');
+  }
+
   return new SignJWT({
     email: user.email,
     name: user.name,
@@ -41,6 +52,11 @@ export async function signSession(user: SessionUser) {
 }
 
 export async function verifySession(token: string): Promise<SessionUser | null> {
+  const secret = getSessionSecret();
+  if (!secret) {
+    return null;
+  }
+
   try {
     const { payload } = await jwtVerify(token, secret);
     if (!payload.sub || typeof payload.email !== 'string' || typeof payload.name !== 'string' || typeof payload.role !== 'string') {
